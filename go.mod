@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/prometheus/client_golang v1.14.0
 	golang.org/x/crypto v0.5.0
-	golang.org/x/exp v0.0.0-20230108222341-4b8118a2686a
+	golang.org/x/exp v0.0.0-20230116083435-1de6713980de
 	golang.org/x/text v0.6.0
 )
 
