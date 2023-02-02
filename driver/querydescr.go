@@ -66,7 +66,7 @@ type invalidQueryError struct {
 }
 
 func (e *invalidQueryError) Error() string {
-	return fmt.Sprintf("ivalid query parameter: %s", e.query)
+	return fmt.Sprintf("invalid query parameter: %s", e.query)
 }
 
 var errEmptyQuery = errors.New("query parameter is empty")

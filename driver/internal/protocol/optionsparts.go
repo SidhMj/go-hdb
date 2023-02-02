@@ -31,8 +31,14 @@ const (
 type statementContextType int8
 
 const (
-	scStatementSequenceInfo statementContextType = 1
-	scServerExecutionTime   statementContextType = 2
+	scStatementSequenceInfo         statementContextType = 1
+	scServerProcessingTime          statementContextType = 2
+	scSchemaName                    statementContextType = 3
+	scFlagSet                       statementContextType = 4
+	scQueryTimeout                  statementContextType = 5
+	scClientReconnectionWaitTimeout statementContextType = 6
+	scServerCPUTime                 statementContextType = 7
+	scServerMemoryUsage             statementContextType = 8
 )
 
 // transaction flags

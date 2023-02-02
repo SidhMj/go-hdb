@@ -91,9 +91,11 @@ func TestConnector(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			t.Parallel()
-			test.fct(t)
-		})
+		func(name string, fct func(t *testing.T)) {
+			t.Run(name, func(t *testing.T) {
+				t.Parallel()
+				fct(t)
+			})
+		}(test.name, test.fct)
 	}
 }

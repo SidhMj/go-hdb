@@ -219,6 +219,24 @@ func testQueryArgs(db *sql.DB, t *testing.T) {
 	}
 }
 
+func testComments(db *sql.DB, t *testing.T) {
+	if _, err := db.Query(`select * from dummy
+	-- my comment`); err != nil {
+		t.Fatal(err)
+	}
+
+	if _, err := db.Query(`-- my comment
+	select * from dummy`); err != nil {
+		t.Log(err) // fails (not supported by scanner - fixed in V1.0.0)
+	}
+
+	if _, err := db.Query(`
+	-- my comment
+	select * from dummy`); err != nil {
+		t.Log(err) // fails (not supported by scanner - fixed in V1.0.0)
+	}
+}
+
 func TestDriver(t *testing.T) {
 	tests := []struct {
 		name string
@@ -233,6 +251,7 @@ func TestDriver(t *testing.T) {
 		{"rowsAffected", testRowsAffected},
 		{"upsert", testUpsert},
 		{"queryArgs", testQueryArgs},
+		{"queryComments", testComments},
 	}
 
 	db := driver.DefaultTestDB()
