@@ -3,6 +3,10 @@ Release Notes
 
 ## Release 0.111
 
+Release 0.111.11 (upgrade urgency: no need for upgrade)
+
+- Updated README.md
+
 Release 0.111.10 (upgrade urgency: no need for upgrade)
 
 - Added support of Go 1.20
