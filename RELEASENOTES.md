@@ -3,6 +3,10 @@ Release Notes
 
 ## Release 0.111
 
+Release 0.111.12 (upgrade urgency: no need for upgrade)
+
+- Fixed go-mod Go version
+
 Release 0.111.11 (upgrade urgency: no need for upgrade)
 
 - Updated README.md
