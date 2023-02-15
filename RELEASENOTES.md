@@ -3,6 +3,10 @@ Release Notes
 
 ## Release 0.111
 
+Release 0.111.13 (upgrade urgency: no need for upgrade)
+
+- Upgraded dependencies (see go.mod)
+
 Release 0.111.12 (upgrade urgency: no need for upgrade)
 
 - Fixed go-mod Go version
