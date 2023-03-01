@@ -3,6 +3,10 @@ Release Notes
 
 ## Release 0.111
 
+Release 0.111.14 (upgrade urgency: high)
+
+- Fixed slice resize runtime error: slice bounds out of range
+
 Release 0.111.13 (upgrade urgency: no need for upgrade)
 
 - Upgraded dependencies (see go.mod)
