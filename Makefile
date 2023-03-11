@@ -11,7 +11,7 @@ all:
 	@echo execute tests on latest go version	
 	go test ./...
 	@echo execute tests on older supported go versions
-	go1.19.6 test ./...
+	go1.19.7 test ./...
 	go1.18.10 test ./...
 	@echo "reuse (license) check"
 	reuse lint
@@ -27,8 +27,8 @@ tools:
 
 #install additional go versions
 go:
-	go install golang.org/dl/go1.19.6@latest
-	go1.19.6 download
+	go install golang.org/dl/go1.19.7@latest
+	go1.19.7 download
 	go install golang.org/dl/go1.18.10@latest
 	go1.18.10 download
 
