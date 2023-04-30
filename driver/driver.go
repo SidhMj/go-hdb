@@ -10,7 +10,7 @@ import (
 )
 
 // DriverVersion is the version number of the hdb driver.
-const DriverVersion = "0.111.16"
+const DriverVersion = "0.111.17"
 
 // DriverName is the driver name to use with sql.Open for hdb databases.
 const DriverName = "hdb"
