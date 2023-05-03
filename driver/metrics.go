@@ -3,6 +3,7 @@ package driver
 import (
 	"fmt"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"golang.org/x/exp/slices"
@@ -109,7 +110,7 @@ type metrics struct {
 	wg    *sync.WaitGroup
 	chMsg chan any
 
-	closed atomicBool
+	closed atomic.Bool
 }
 
 const (

@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+## Release 0.112
+
+#### Release Notes
+
+- Dropped support of Go language versions < Go 1.19
+
 ## Release 0.111
 
 Release 0.111.17 (upgrade urgency: no need for upgrade)
