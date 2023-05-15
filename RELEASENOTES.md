@@ -3,6 +3,10 @@ Release Notes
 
 ## Release 0.112
 
+Release 0.112.1
+
+- Upgraded dependencies
+
 #### Release Notes
 
 - Dropped support of Go language versions < Go 1.19
