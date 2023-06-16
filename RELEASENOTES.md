@@ -3,6 +3,10 @@ Release Notes
 
 ## Release 0.112
 
+Release 0.112.2
+
+- Upgraded dependencies
+
 Release 0.112.1
 
 - Upgraded dependencies
