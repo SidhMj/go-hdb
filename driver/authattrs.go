@@ -31,7 +31,7 @@ type authAttrs struct {
 
 func isJWTToken(token string) bool { return strings.HasPrefix(token, "ey") }
 
-func (c *authAttrs) cookieAuth() *p.Auth {
+func (c *authAttrs) cookieAuth() *p.AuthHnd {
 	if !c.hasCookie.Load() { // fastpath without lock
 		return nil
 	}
@@ -39,16 +39,16 @@ func (c *authAttrs) cookieAuth() *p.Auth {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
-	auth := p.NewAuth(c._logonname)                                 // important: for session cookie auth we do need the logonname from JWT auth,
+	auth := p.NewAuthHnd(c._logonname)                              // important: for session cookie auth we do need the logonname from JWT auth,
 	auth.AddSessionCookie(c._sessionCookie, c._logonname, clientID) // and for HANA onPrem the final session cookie req needs the logonname as well.
 	return auth
 }
 
-func (c *authAttrs) auth() *p.Auth {
+func (c *authAttrs) auth() *p.AuthHnd {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
-	auth := p.NewAuth(c._username) // use username as logonname
+	auth := p.NewAuthHnd(c._username) // use username as logonname
 	if c._certKey != nil {
 		auth.AddX509(c._certKey)
 	}
@@ -65,79 +65,65 @@ func (c *authAttrs) auth() *p.Auth {
 	return auth
 }
 
-func (c *authAttrs) refreshPassword(passwordSetter p.AuthPasswordSetter) (bool, error) {
-	refreshPassword := c.RefreshPassword()
-	if refreshPassword == nil {
-		return false, nil
-	}
+func (c *authAttrs) callRefreshPasswordWithLock() (string, bool) {
+	refreshPassword := c._refreshPassword // copy within lock
 	c.cbmu.Lock()
 	defer c.cbmu.Unlock()
-	if password, ok := c._refreshPassword(); ok {
-		c.mu.Lock()
-		defer c.mu.Unlock()
-		if password != c._password {
-			c._password = password
-			passwordSetter.SetPassword(password)
-			return true, nil
-		}
-	}
-	return false, nil
+	c.mu.Unlock() // unlock attr, so that callback can call attr methods
+	defer c.mu.Lock()
+	return refreshPassword()
 }
 
-func (c *authAttrs) refreshToken(tokenSetter p.AuthTokenSetter) (bool, error) {
-	refreshToken := c.RefreshToken()
-	if refreshToken == nil {
-		return false, nil
-	}
+func (c *authAttrs) callRefreshTokenWithLock() (string, bool) {
+	refreshToken := c._refreshToken // copy within lock
 	c.cbmu.Lock()
 	defer c.cbmu.Unlock()
-	if token, ok := c._refreshToken(); ok {
-		c.mu.Lock()
-		defer c.mu.Unlock()
-		if token != c._token {
-			c._token = token
-			tokenSetter.SetToken(token)
-			return true, nil
-		}
-	}
-	return false, nil
+	c.mu.Unlock() // unlock attr, so that callback can call attr methods
+	defer c.mu.Lock()
+	return refreshToken()
 }
 
-func (c *authAttrs) refreshCertKey(certKeySetter p.AuthCertKeySetter) (bool, error) {
-	refreshClientCert := c.RefreshClientCert()
-	if refreshClientCert == nil {
-		return false, nil
-	}
+func (c *authAttrs) callRefreshClientCertWithLock() ([]byte, []byte, bool) {
+	refreshClientCert := c._refreshClientCert // copy within lock
 	c.cbmu.Lock()
 	defer c.cbmu.Unlock()
-	if clientCert, clientKey, ok := c._refreshClientCert(); ok {
-		c.mu.Lock()
-		defer c.mu.Unlock()
-		if !c._certKey.Equal(clientCert, clientKey) {
-			certKey, err := x509.NewCertKey(clientCert, clientKey)
-			if err != nil {
-				return false, err
+	c.mu.Unlock() // unlock attr, so that callback can call attr methods
+	defer c.mu.Lock()
+	return refreshClientCert()
+}
+
+func (c *authAttrs) refresh() (bool, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	refresh := false
+
+	if c._refreshPassword != nil {
+		if password, ok := c.callRefreshPasswordWithLock(); ok {
+			if password != c._password {
+				refresh, c._password = true, password
 			}
-			c._certKey = certKey
-			certKeySetter.SetCertKey(certKey)
-			return true, nil
 		}
 	}
-	return false, nil
-}
-
-func (c *authAttrs) refresh(auth *p.Auth) (bool, error) {
-	switch method := auth.Method().(type) {
-
-	case p.AuthPasswordSetter:
-		return c.refreshPassword(method)
-	case p.AuthTokenSetter:
-		return c.refreshToken(method)
-	case p.AuthCertKeySetter:
-		return c.refreshCertKey(method)
-	default:
-		return false, nil
+	if c._refreshToken != nil {
+		if token, ok := c.callRefreshTokenWithLock(); ok {
+			if token != c._token {
+				refresh, c._token = true, token
+			}
+		}
 	}
+	if c._refreshClientCert != nil {
+		if clientCert, clientKey, ok := c.callRefreshClientCertWithLock(); ok {
+			if !c._certKey.Equal(clientCert, clientKey) {
+				certKey, err := x509.NewCertKey(clientCert, clientKey)
+				if err != nil {
+					return refresh, err
+				}
+				refresh, c._certKey = true, certKey
+			}
+		}
+	}
+	return refresh, nil
 }
 
 func (c *authAttrs) invalidateCookie() { c.hasCookie.Store(false) }

@@ -284,9 +284,12 @@ func newConn(ctx context.Context, metrics *metrics, connAttrs *connAttrs, authAt
 		authAttrs.invalidateCookie() // cookie auth was not possible - do not try again with the same data
 	}
 
-	auth := authAttrs.auth()
-	retries := 1
+	const maxRetry = 1
+	numRetry := 0
+
 	for {
+		auth := authAttrs.auth()
+
 		conn, err := initConn(ctx, metrics, connAttrs, auth)
 		if err == nil {
 			if method, ok := auth.Method().(p.AuthCookieGetter); ok {
@@ -297,21 +300,21 @@ func newConn(ctx context.Context, metrics *metrics, connAttrs *connAttrs, authAt
 		if !isAuthError(err) {
 			return nil, err
 		}
-		if retries < 1 {
+		if numRetry >= maxRetry {
 			return nil, err
 		}
-		refresh, refreshErr := authAttrs.refresh(auth)
+		refresh, refreshErr := authAttrs.refresh()
 		if refreshErr != nil {
 			return nil, refreshErr
 		}
 		if !refresh {
 			return nil, err
 		}
-		retries--
+		numRetry++
 	}
 }
 
-func initConn(ctx context.Context, metrics *metrics, attrs *connAttrs, auth *p.Auth) (driver.Conn, error) {
+func initConn(ctx context.Context, metrics *metrics, attrs *connAttrs, authHnd *p.AuthHnd) (driver.Conn, error) {
 	netConn, err := attrs._dialer.DialContext(ctx, attrs._host, dial.DialerOptions{Timeout: attrs._timeout, TCPKeepAlive: attrs._tcpKeepAlive})
 	if err != nil {
 		return nil, err
@@ -347,7 +350,7 @@ func initConn(ctx context.Context, metrics *metrics, attrs *connAttrs, auth *p.A
 
 	c.sessionID = defaultSessionID
 
-	if c.sessionID, c.serverOptions, err = c._authenticate(auth, attrs._applicationName, attrs._dfv, attrs._locale); err != nil {
+	if c.sessionID, c.serverOptions, err = c._authenticate(authHnd, attrs._applicationName, attrs._dfv, attrs._locale); err != nil {
 		return nil, err
 	}
 
@@ -1251,7 +1254,7 @@ func (c *conn) _dbConnectInfo(databaseName string) (*DBConnectInfo, error) {
 	}, nil
 }
 
-func (c *conn) _authenticate(auth *p.Auth, applicationName string, dfv int, locale string) (int64, p.Options[p.ConnectOption], error) {
+func (c *conn) _authenticate(authHnd *p.AuthHnd, applicationName string, dfv int, locale string) (int64, p.Options[p.ConnectOption], error) {
 	defer c.addTimeValue(time.Now(), timeAuth)
 
 	// client context
@@ -1261,7 +1264,7 @@ func (c *conn) _authenticate(auth *p.Auth, applicationName string, dfv int, loca
 		p.CcoClientApplicationProgram: applicationName,
 	}
 
-	initRequest, err := auth.InitRequest()
+	initRequest, err := authHnd.InitRequest()
 	if err != nil {
 		return 0, nil, err
 	}
@@ -1269,7 +1272,7 @@ func (c *conn) _authenticate(auth *p.Auth, applicationName string, dfv int, loca
 		return 0, nil, err
 	}
 
-	initReply, err := auth.InitReply()
+	initReply, err := authHnd.InitReply()
 	if err != nil {
 		return 0, nil, err
 	}
@@ -1281,7 +1284,7 @@ func (c *conn) _authenticate(auth *p.Auth, applicationName string, dfv int, loca
 		return 0, nil, err
 	}
 
-	finalRequest, err := auth.FinalRequest()
+	finalRequest, err := authHnd.FinalRequest()
 	if err != nil {
 		return 0, nil, err
 	}
@@ -1306,7 +1309,7 @@ func (c *conn) _authenticate(auth *p.Auth, applicationName string, dfv int, loca
 		return 0, nil, err
 	}
 
-	finalReply, err := auth.FinalReply()
+	finalReply, err := authHnd.FinalReply()
 	if err != nil {
 		return 0, nil, err
 	}

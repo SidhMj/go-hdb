@@ -16,9 +16,6 @@ func NewJWT(token string) *JWT { return &JWT{token: token} }
 
 func (a *JWT) String() string { return fmt.Sprintf("method type %s token %s", a.Typ(), a.token) }
 
-// SetToken implements the AuthTokenSetter interface.
-func (a *JWT) SetToken(token string) { a.token = token }
-
 // Cookie implements the CookieGetter interface.
 func (a *JWT) Cookie() (string, []byte) { return a.logonname, a._cookie }
 

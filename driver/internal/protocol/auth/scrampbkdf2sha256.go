@@ -27,9 +27,6 @@ func (a *SCRAMPBKDF2SHA256) String() string {
 	return fmt.Sprintf("method type %s clientChallenge %v", a.Typ(), a.clientChallenge)
 }
 
-// SetPassword implenets the AuthPasswordSetter interface.
-func (a *SCRAMPBKDF2SHA256) SetPassword(password string) { a.password = password }
-
 // Typ implements the CookieGetter interface.
 func (a *SCRAMPBKDF2SHA256) Typ() string { return MtSCRAMPBKDF2SHA256 }
 

@@ -29,7 +29,7 @@ func authDecodeStep(part partReader, data []byte, t *testing.T) {
 }
 
 func testJWTAuth(t *testing.T) {
-	a := NewAuth("")
+	a := NewAuthHnd("")
 	a.AddJWT("dummy token")
 
 	successful := t.Run("init request", func(t *testing.T) {

@@ -3,6 +3,10 @@ Release Notes
 
 ## Release 0.112
 
+Release 0.112.3
+
+- Fixed authentication refresh issue when using more than one authentication method
+
 Release 0.112.2
 
 - Upgraded dependencies
