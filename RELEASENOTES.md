@@ -3,6 +3,10 @@ Release Notes
 
 ## Release 0.112
 
+Release 0.112.4
+
+- Fixed refresh deadlock if refresh is called concurrently
+
 Release 0.112.3
 
 - Fixed authentication refresh issue when using more than one authentication method
