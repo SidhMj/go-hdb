@@ -19,7 +19,17 @@ type authMethods map[string]auth.Method // key equals authentication method type
 
 func (m authMethods) order() []auth.Method {
 	methods := maps.Values(m)
-	slices.SortFunc(methods, func(a, b auth.Method) bool { return a.Order() < b.Order() })
+	slices.SortFunc(methods, func(m1, m2 auth.Method) int {
+		o1, o2 := m1.Order(), m2.Order()
+		switch {
+		case o1 == o2:
+			return 0
+		case o1 < o2:
+			return -1
+		default:
+			return 1
+		}
+	})
 	return methods
 }
 
