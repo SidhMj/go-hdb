@@ -3,6 +3,10 @@ Release Notes
 
 ## Release 0.112
 
+Release 0.112.7
+
+- Upgraded dependencies
+
 Release 0.112.6
 
 - fixed compiling bug due to incompatible changes in https://github.com/golang/exp/commit/302865e7556b4ae5de27248ce625d443ef4ad3ed 
