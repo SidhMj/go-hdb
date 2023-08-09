@@ -10,7 +10,7 @@ For the official SAP HANA client Go support (not this database driver) please se
 
 ## Version
 
-This is the v0 legacy version of the go-hdb driver. Go [1.20](https://go.dev/doc/go1.20) would be the last supported Go version and after Go 1.20 is out of maintenance (most probably when Go 1.22 would be available) this go-hdb version is going to be sunsetted as well.
+This is the v0 legacy version of the go-hdb driver. Go [1.20](https://go.dev/doc/go1.20) would be the last and only supported Go version and after Go 1.20 is out of maintenance (most probably when Go 1.22 would be available) this go-hdb version is going to be sunsetted as well.
 New features are only going to be available in [go-hdb v1](https://github.com/SAP/go-hdb/tree/main) whereas this version would only receive updates of libraries it depends on.
 
 ## Installation

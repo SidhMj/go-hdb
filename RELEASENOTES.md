@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+## Release 0.113
+
+#### Release Notes
+
+- Limit legacy version to Go 1.20
+- Dropped support of Go language versions < Go 1.20
+
 ## Release 0.112
 
 Release 0.112.8
