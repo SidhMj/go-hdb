@@ -3,6 +3,11 @@ Release Notes
 
 ## Release 0.113
 
+Release 0.113.1
+
+- fixed bug: connection retry in case refresh callback has new version
+- updated dependencies
+
 #### Release Notes
 
 - Limit legacy version to Go 1.20
